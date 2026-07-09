@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=68", "wheel>=0.43"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evalforge"
+version = "0.17.0"
+description = "Measurement-valid AI evaluation, calibration, routing, and evaluator-to-training transfer framework."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Jinwoo Bae"}]
+dependencies = [
+  "numpy>=1.26,<3",
+  "pandas>=2.1,<4",
+  "scikit-learn>=1.4,<2",
+  "matplotlib>=3.8,<4",
+  "PyYAML>=6.0,<7",
+  "joblib>=1.3,<2",
+  "tabulate>=0.9,<1",
+]
+
+[project.optional-dependencies]
+gpu = [
+  "torch>=2.4,<3",
+  "transformers>=4.45,<6",
+  "accelerate>=1.0,<2",
+  "peft>=0.13,<1",
+  "bitsandbytes>=0.45.3,<1",
+  "trl>=0.29.1,<0.30",
+  "datasets>=3.0,<5",
+]
+dev = [
+  "pytest>=8.0,<10",
+  "ruff>=0.6,<1",
+  "build>=1.2,<2",
+  "twine>=6.0,<7",
+]
+
+[project.scripts]
+evalforge = "evalforge.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+evalforge = ["resources/*.yaml"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Runtime reports, checkpoints, and inline Python helpers are generated under
+# outputs/. They are evidence artifacts, not maintained source files.
+extend-exclude = ["outputs"]
+force-exclude = true
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

@@ -1,0 +1,31 @@
+run:
+  run_name: smoke_v05
+  seed: 1729
+  output_root: outputs/runs
+
+data:
+  fixture_path: outputs/fixtures/synthetic_eval_pairs.csv
+  source_type: synthetic_fixture
+  provenance_verified: false
+  rebuild_synthetic_fixture_on_schema_error: true
+  train_split: train
+  calibration_split: calibration
+  policy_split: policy
+  dpo_split: dpo
+  final_split: final
+anchors:
+  static_budget: 8
+  adaptive_budget: 12
+routing:
+  auto_accept_min_p_correct: 0.90
+  max_wrong_auto_label_rate: 0.05
+  max_escalation_rate: 0.20
+  max_order_delta: 0.20
+  max_style_delta: 0.15
+  max_order_flip_rate: 0.10
+  max_style_flip_rate: 0.10
+  max_ece: 0.10
+  min_auto_accept_coverage: 0.60
+report:
+  save_svg: true
+  save_html: true

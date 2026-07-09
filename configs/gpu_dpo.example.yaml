@@ -1,0 +1,18 @@
+# GPU-only optional path. Do not point pairs_path at evaluator final-test items.
+experiment_id: evalforge_equal_budget_raw_judge_seed1729
+label_source: raw_judge
+model_id: Qwen/Qwen3-0.6B
+pairs_path: outputs/non_final_preference_pairs.jsonl
+output_dir: outputs/dpo_adapter_raw_judge_seed1729
+seed: 1729
+load_in_4bit: true
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+batch_size: 1
+gradient_accumulation: 8
+epochs: 1
+learning_rate: 5.0e-5
+max_length: 768
+max_prompt_length: 384
+bf16: true

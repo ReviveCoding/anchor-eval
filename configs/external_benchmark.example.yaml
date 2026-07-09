@@ -1,0 +1,32 @@
+# Template only. Do not use a final-only benchmark for any fitting split.
+run:
+  run_name: external_evaluator_validation
+  seed: 1729
+  output_root: outputs/external_runs
+
+data:
+  fixture_path: data/external/benchmark_scored.csv
+  source_type: external_benchmark
+  provenance_verified: true
+  provenance_manifest_path: data/external/benchmark_provenance.json
+  train_split: train
+  calibration_split: calibration
+  policy_split: policy
+  dpo_split: dpo
+  final_split: final
+anchors:
+  static_budget: 16
+  adaptive_budget: 24
+routing:
+  auto_accept_min_p_correct: 0.90
+  max_wrong_auto_label_rate: 0.05
+  max_escalation_rate: 0.20
+  max_order_delta: 0.20
+  max_style_delta: 0.15
+  max_order_flip_rate: 0.10
+  max_style_flip_rate: 0.10
+  max_ece: 0.10
+  min_auto_accept_coverage: 0.60
+report:
+  save_svg: true
+  save_html: true
