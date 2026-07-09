@@ -57,7 +57,7 @@ jobs:
 
       - name: Verify Python file invocation contract
         shell: pwsh
-        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/verify_python_file_invocation.ps1
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/verify_python_file_invocation.ps1 -PythonExe python
 
       - name: Runtime origin diagnostics
         run: python -m evalforge doctor --json
