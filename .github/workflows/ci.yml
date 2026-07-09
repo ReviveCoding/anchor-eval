@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload validation evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cpu-validation-${{ matrix.os }}-py${{ matrix.python-version }}
           path: |
@@ -110,7 +110,7 @@ jobs:
           python -m twine check dist/*
 
       - name: Upload distributions
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-distributions
           path: dist/
@@ -157,7 +157,7 @@ jobs:
 
       - name: Upload distribution-install evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: distribution-install-${{ matrix.os }}-${{ matrix.distribution }}
           path: |
