@@ -12,29 +12,15 @@ Each response pair is routed to one of three actions:
 
 A run also emits `PASS`, `CONDITIONAL_PASS`, or `BLOCK`. Controlled synthetic evidence validates software behavior but can never qualify a release.
 
-## v1.5 pre-execution final verification and reliability highlights
+## Windows judge scoring and package checks
 
-On Windows, local judge scoring defaults to **BF16 direct loading** of Qwen rather than bitsandbytes 4-bit conversion. The runner probes the exact Qwen model in an isolated child process before creating scoring artifacts. Use 4-bit only via an explicit CLI opt-in after it has separately passed this probe on the local machine.
+Windows judge scoring uses BF16 Qwen loading by default. An isolated child process verifies that the model can load before any scoring artifacts are created. The 4-bit path requires explicit opt-in after separate local qualification. The runner requires at least 12 GiB of free VRAM.
 
-The final CPU and package-path checks are recorded in [`VALIDATION.md`](VALIDATION.md). The Windows runner is also parsed by a native PowerShell parser in the Windows GitHub Actions job before its normal CPU test and smoke stages.
+For a local Windows run, validate the PowerShell scripts with `scripts/verify_powershell_syntax.ps1` and `scripts/verify_python_file_invocation.ps1`, then use `scripts/run_anchor_eval_v15.ps1`.
 
-For the Windows 11 / RTX 4090 FinQA + JudgeBench execution path, run `scripts/run_anchor_eval_v15.ps1`. Before the full runner, execute `scripts/verify_powershell_syntax.ps1` and `scripts/verify_python_file_invocation.ps1`.
+Scoring can resume from completed chunks only when the model, input fingerprint, item order, configuration, and checksum match. Completed outputs are atomically published after row-count and SHA-256 checks. Smoke fixtures are generated under ignored `outputs/fixtures/`; installed-package checks run against both the wheel and source distribution.
 
-- Manifest-bound checkpoint/resume support for local judge scoring; completed chunks are reused only when the input fingerprint, model ID, quantization mode, token limit, chunk plan, and exact item order match.
-- Completed score reuse is fail-closed: the PowerShell runner validates the checkpoint request, completion status, final CSV SHA-256, row count, item order, local-score status, and judge model before it accepts an existing scored CSV.
-- Atomic per-chunk and final CSV publication with a completion manifest.
-- The Windows runner requires at least 12 GiB free GPU memory before it begins its BF16 Qwen load probe and writes each external held-out evaluation into a directory keyed by candidate-bundle and scored-input hashes.
-
-- Generated smoke fixtures now live under ignored `outputs/fixtures/`; the canonical smoke pipeline creates them automatically, so a clean checkout does not mutate source-like `data/` paths.
-- The complete `outputs/` runtime-artifact tree is excluded from Ruff linting and formatting. This includes generated inline Python helpers created by the Windows runner; `force-exclude = true` ensures that stale artifacts cannot break source quality gates on rerun.
-- Historical validation exports and redundant implementation-loop documents were removed from the source bundle. The repository keeps a concise changelog, current validation record, configuration examples, and the runtime documentation needed to reproduce the system.
-- Wheel-only installation checking was generalized into a single clean-distribution verifier that validates both wheels and source distributions outside the source tree.
-- CI builds distributions once, validates package metadata with `twine check`, transfers artifacts between jobs, verifies wheel installation on Ubuntu and Windows, and verifies source-distribution installation on Ubuntu.
-- Linting and formatting run once on the canonical Ubuntu/Python 3.11 job rather than redundantly across every matrix entry; tests and end-to-end smoke runs remain cross-platform.
-- Every CI job has a timeout, least-privilege token permissions, dependency caching, and a static workflow contract test.
-- The canonical smoke YAML is packaged with both wheel and source distribution. `evalforge write-smoke-config` exports it into an isolated directory, allowing installed-package smoke validation with no borrowed source-tree config.
-- Before atomic publication, the pipeline validates its required evidence contract and writes a SHA-256 artifact inventory. A missing, malformed, or symlinked required file leaves the run unpublished.
-- Clean-install CI artifacts exclude the temporary virtual environment; only the validation summary and atomically published outputs are retained.
+The CPU validation record and CI coverage are in [VALIDATION.md](VALIDATION.md). CI checks package metadata, isolated installation, tests, and smoke paths on Ubuntu and Windows.
 
 ## Candidate hierarchy
 
