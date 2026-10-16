@@ -9,10 +9,10 @@ from typing import Any
 import yaml
 
 REQUIRED_ACTIONS = {
-    "actions/checkout@v6",
-    "actions/setup-python@v6",
-    "actions/upload-artifact@v4",
-    "actions/download-artifact@v4",
+    "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+    "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+    "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+    "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
 }
 
 
