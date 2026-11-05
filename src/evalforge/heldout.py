@@ -36,7 +36,7 @@ def _file_integrity(path: Path) -> dict[str, object]:
     if not path.exists() or not path.is_file():
         raise FileNotFoundError(f"Required held-out artifact does not exist: {path}")
     return {
-        "sha256": sha256(path.read_bytes()).hexdigest(),
+        "sha256": dataset_fingerprint(path),
         "bytes": int(path.stat().st_size),
     }
 
@@ -51,7 +51,7 @@ def _load_bundle_manifest(path: Path) -> dict[str, Any]:
         raise ValueError("Candidate bundle manifest must be valid JSON.") from exc
     if not isinstance(manifest, dict):
         raise ValueError("Candidate bundle manifest root must be a JSON object.")
-    actual_sha = sha256(path.read_bytes()).hexdigest()
+    actual_sha = dataset_fingerprint(path)
     if actual_sha != manifest.get("bundle_sha256"):
         raise ValueError(
             "Candidate bundle checksum mismatch; refuse to load potentially stale or modified artifact."
@@ -87,7 +87,7 @@ def save_candidate_bundle(
     manifest = {
         "bundle_schema_version": BUNDLE_SCHEMA_VERSION,
         "bundle_path": public_path or str(destination),
-        "bundle_sha256": sha256(destination.read_bytes()).hexdigest(),
+        "bundle_sha256": dataset_fingerprint(destination),
         "candidate_ids": sorted(candidates),
         "protected_source_group_hashes": sorted({_hash_group(str(group)) for group in protected}),
         **metadata_copy,

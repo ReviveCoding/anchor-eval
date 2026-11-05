@@ -267,23 +267,24 @@ def operating_profile_scenarios(
     )
     eligible = ~(conflict | order_unstable | style_unstable)
     thresholds = np.unique(np.concatenate(([0.50], prediction.p_correct, [0.9999])))
-    rows: list[dict[str, object]] = []
-    for capacity in escalation_capacities:
-        feasible: list[dict[str, float]] = []
+    operating_points: list[dict[str, float]] = []
+    if escalation_capacities:
         for threshold in thresholds:
             accept = eligible & (prediction.p_correct >= threshold)
             coverage = float(accept.mean())
             wrong = float(1.0 - correct[accept].mean()) if accept.any() else 0.0
-            escalation = 1.0 - coverage
-            if wrong <= max_wrong_auto_label_rate and escalation <= capacity:
-                feasible.append(
+            if wrong <= max_wrong_auto_label_rate:
+                operating_points.append(
                     {
                         "threshold": float(threshold),
                         "coverage": coverage,
                         "wrong_auto_label_rate": wrong,
-                        "escalation_rate": escalation,
+                        "escalation_rate": 1.0 - coverage,
                     }
                 )
+    rows: list[dict[str, object]] = []
+    for capacity in escalation_capacities:
+        feasible = [point for point in operating_points if point["escalation_rate"] <= capacity]
         profile = f"review_capacity_{int(round(capacity * 100))}pct"
         if feasible:
             selected = max(feasible, key=lambda row: (row["coverage"], -row["threshold"]))

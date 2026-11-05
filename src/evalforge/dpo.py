@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import inspect
 import json
-from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+
+from .data import dataset_fingerprint
 
 DPO_REQUIRED_COLUMNS = {"item_id", "source_group", "domain", "prompt", "chosen", "rejected"}
 
@@ -107,8 +108,8 @@ def build_equal_budget_label_pools(
             "pool_dir": str(output_dir.name),
             "raw_path": str(raw_path.name),
             "routed_path": str(routed_path.name),
-            "raw_fingerprint_sha256": sha256(raw_path.read_bytes()).hexdigest(),
-            "routed_fingerprint_sha256": sha256(routed_path.read_bytes()).hexdigest(),
+            "raw_fingerprint_sha256": dataset_fingerprint(raw_path),
+            "routed_fingerprint_sha256": dataset_fingerprint(routed_path),
             "same_item_ids": True,
             "claim_boundary": (
                 "No routed labels met the safety policy. DPO training is unavailable, and this run "
@@ -145,8 +146,8 @@ def build_equal_budget_label_pools(
         "pool_dir": str(output_dir.name),
         "raw_path": str(raw_path.name),
         "routed_path": str(routed_path.name),
-        "raw_fingerprint_sha256": sha256(raw_path.read_bytes()).hexdigest(),
-        "routed_fingerprint_sha256": sha256(routed_path.read_bytes()).hexdigest(),
+        "raw_fingerprint_sha256": dataset_fingerprint(raw_path),
+        "routed_fingerprint_sha256": dataset_fingerprint(routed_path),
         "same_item_ids": True,
         "claim_boundary": "Pools only. Equal-budget DPO training and independent downstream evaluation remain required.",
     }
@@ -453,7 +454,7 @@ def run_optional_dpo(config: dict[str, Any]) -> None:
     trainer.save_model(output_dir)
     manifest = {
         **config,
-        "pairs_fingerprint_sha256": sha256(Path(pairs_path).read_bytes()).hexdigest(),
+        "pairs_fingerprint_sha256": dataset_fingerprint(pairs_path),
         "torch_version": torch.__version__,
         "cuda": torch.version.cuda,
         "gpu_name": torch.cuda.get_device_name(0),

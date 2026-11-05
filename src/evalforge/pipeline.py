@@ -60,7 +60,7 @@ def _config_hash(config: dict[str, Any]) -> str:
 
 
 def _sha256_file(path: Path) -> str:
-    return sha256(path.read_bytes()).hexdigest()
+    return dataset_fingerprint(path)
 
 
 def _run_dir(config: dict[str, Any]) -> Path:
