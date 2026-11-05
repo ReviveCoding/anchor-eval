@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import math
 from collections.abc import Iterable
-from hashlib import sha256
+from hashlib import file_digest
 from pathlib import Path
 
 import numpy as np
@@ -226,7 +226,8 @@ def validate_pairs(frame: pd.DataFrame) -> None:
 
 
 def dataset_fingerprint(path: str | Path) -> str:
-    return sha256(Path(path).read_bytes()).hexdigest()
+    with Path(path).open("rb") as stream:
+        return file_digest(stream, "sha256").hexdigest()
 
 
 def source_type_is_synthetic(source_type: str, frame: pd.DataFrame) -> bool:
